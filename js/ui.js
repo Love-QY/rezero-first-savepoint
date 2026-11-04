@@ -58,7 +58,8 @@ export class UI {
       if (self.$("title").classList.contains("hidden")) return;
       self.startNew();
     });
-    this.$("btn-continue").addEventListener("click", function() { self.continueGame(); });
+    const btnContinue = this.$("btn-continue");
+    if (btnContinue) btnContinue.addEventListener("click", function() { self.continueGame(); });
     this.$("btn-about").addEventListener("click", function() { self.openAbout(); });
 
     this.$("dialogue").addEventListener("click", function() { self.onAdvanceInput(); });
@@ -116,7 +117,7 @@ export class UI {
     });
 
     const hasSave = !!localStorage.getItem(CONFIG.saveKey);
-    this.$("btn-continue").disabled = !hasSave;
+    if (btnContinue) btnContinue.disabled = !hasSave;
   }
 
   loadSettings() {
@@ -136,7 +137,8 @@ export class UI {
     this.applyTitleArt();
     this.$("game").classList.add("hidden");
     this.$("title").classList.remove("hidden");
-    this.$("btn-continue").disabled = !localStorage.getItem(CONFIG.saveKey);
+    const btnContinue = this.$("btn-continue");
+    if (btnContinue) btnContinue.disabled = !localStorage.getItem(CONFIG.saveKey);
   }
 
   startNew() {
@@ -602,7 +604,8 @@ export class UI {
     log.innerHTML += "<p class=\"chat-line user\"><b>你</b><br>" + esc(text) + "</p>";
     input.value = "";
     this.chatBusy = true;
-    this.$("ai-send").disabled = true;
+    const sendBtn = this.$("ai-send");
+    if (sendBtn) sendBtn.disabled = true;
     const replyId = "ai-reply-" + Date.now();
     log.innerHTML += "<p class=\"chat-line\" id=\"" + replyId + "\"><b>" + esc(char.name) + "</b><br></p>";
     log.scrollTop = log.scrollHeight;
@@ -631,11 +634,14 @@ export class UI {
       this.chatHistory.push({ role: "assistant", content: full });
       this.engine.recordMemory(charId, "与昴自由对话：" + text.slice(0, 40), "witnessed", false);
     } catch (err) {
+      const message = err && err.message ? err.message : String(err);
       replyEl.innerHTML = "<b>" + esc(char.name) + "</b><br><span class=\"sys\">连接失败。检查 Ollama 是否运行、OLLAMA_ORIGINS 是否设置。</span>";
-      this.openModal("本地模型连接失败", "<pre style=\"white-space:pre-wrap;color:#cfc7ba;\">" + esc(ollamaSetupText()) + "</pre>");
+      const status = this.$("ai-status");
+      if (status) status.textContent = "连接失败：" + message + "（需要 ollama serve + OLLAMA_ORIGINS=*）";
     } finally {
       this.chatBusy = false;
-      this.$("ai-send").disabled = false;
+      const btn = this.$("ai-send");
+      if (btn) btn.disabled = false;
     }
   }
 
