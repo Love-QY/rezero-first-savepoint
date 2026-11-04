@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0b0a12" />
+  <title>Re:0 — 起始的存档点 · 实机演示</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div id="app">
+    <section id="title" class="screen title-screen">
+      <div class="title-bg"></div>
+      <div class="title-grain"></div>
+      <div class="title-content">
+        <p class="kicker">非商业同人 · 全年龄向 · 多智能体叙事原型</p>
+        <h1 class="logo"><span class="logo-re">Re:</span><span class="logo-zero">0</span></h1>
+        <h2 class="title-sub">起始的存档点</h2>
+        <p class="title-desc">从零开始的异世界生活 · 第一存档点压缩版</p>
+        <div class="title-actions">
+          <button id="btn-start" class="btn primary" onclick="window.__startDemo && window.__startDemo()">开始游戏</button>
+          <button id="btn-continue" class="btn ghost" disabled>继续</button>
+          <button id="btn-about" class="btn ghost">关于本演示</button>
+        </div>
+        <p class="title-tip">按 Enter 也可开始 · 按钮无反应请 <a href="?play=1">点这里</a>，或按 Ctrl+F5 强制刷新</p>
+        <p class="disclaimer">角色与世界观版权归原作者及 KADOKAWA 所有。本演示不包含官方素材，仅用于技术原型与私人研究。</p>
+      </div>
+      <div class="title-footer">SCRIPTED DEMO v0.1 · DIRECTOR / NPC / CHECKPOINT</div>
+    </section>
+
+    <section id="game" class="screen game-screen hidden">
+      <header class="hud">
+        <div class="hud-left">
+          <span id="chapter-label">第一章 · 苹果摊</span>
+          <span class="hud-dot"></span>
+          <span id="loop-label">第 1 周目</span>
+        </div>
+        <div id="checkpoint-label" class="hud-center">存档点：未固定</div>
+        <div class="hud-right">
+          <button id="btn-ai" class="hud-btn" title="连接本地 Ollama 与角色自由对话">AI 对话</button>
+          <button id="btn-dev" class="hud-btn" title="查看导演 / NPC / checkpoint 状态">DEV</button>
+        </div>
+      </header>
+
+      <main id="stage">
+        <div id="bg" class="bg bg-plaza"></div>
+        <div class="bg-vignette"></div>
+        <div id="cg" class="cg hidden"></div>
+        <div id="scene-caption" class="scene-caption"></div>
+        <div id="portraits" class="portraits"></div>
+
+        <div id="dialogue" class="dialogue">
+          <div class="nameplate"><span id="speaker"></span></div>
+          <div id="text" class="text"></div>
+          <div id="advance" class="advance">▼</div>
+        </div>
+
+        <div id="choices" class="choices hidden"></div>
+        <div id="ending" class="ending hidden"></div>
+      </main>
+
+      <footer class="controls">
+        <button id="btn-auto" class="ctl">自动</button>
+        <button id="btn-skip" class="ctl">跳过</button>
+        <button id="btn-log" class="ctl">记录</button>
+        <button id="btn-save" class="ctl">保存</button>
+        <button id="btn-load" class="ctl">读取</button>
+        <button id="btn-settings" class="ctl">设置</button>
+        <button id="btn-menu" class="ctl">标题</button>
+      </footer>
+    </section>
+
+    <aside id="dev-panel" class="dev-panel hidden">
+      <div class="dev-head">
+        <strong>DEVELOPER VIEW</strong>
+        <button id="btn-dev-close" class="icon-btn">×</button>
+      </div>
+      <div class="dev-tabs">
+        <button class="dev-tab active" data-tab="state">STATE</button>
+        <button class="dev-tab" data-tab="agents">AGENTS</button>
+        <button class="dev-tab" data-tab="checkpoint">CHECKPOINT</button>
+        <button class="dev-tab" data-tab="memory">MEMORY</button>
+      </div>
+      <pre id="dev-json" class="dev-json"></pre>
+      <p class="dev-note">脚本模式：NPC 台词来自 story.js；AI 模式需本地 Ollama。</p>
+    </aside>
+
+    <div id="modal" class="modal hidden" role="dialog" aria-modal="true">
+      <div class="modal-card">
+        <div class="modal-head">
+          <h3 id="modal-title">标题</h3>
+          <button id="modal-close" class="icon-btn">×</button>
+        </div>
+        <div id="modal-body" class="modal-body"></div>
+      </div>
+    </div>
+
+    <div id="toast" class="toast hidden"></div>
+    <div id="boot-error" class="boot-error hidden"></div>
+  </div>
+  <script>
+    (function() {
+      function show(message) {
+        var el = document.getElementById("boot-error");
+        if (!el) return;
+        el.classList.remove("hidden");
+        el.textContent = "启动失败：" + message + "\n\n请按 F12 打开控制台，把这段错误发给开发者。";
+        window.__bootError = message;
+      }
+      window.__showBootError = show;
+      window.__startDemo = function() { window.__pendingStart = true; };
+      window.addEventListener("error", function(event) {
+        show(event.message || String(event.error));
+      });
+      window.addEventListener("unhandledrejection", function(event) {
+        var reason = event.reason;
+        show(reason && reason.message ? reason.message : String(reason));
+      });
+    })();
+  </script>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
